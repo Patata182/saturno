@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🪐 Hasta Saturno y más allá</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Hasta Saturno">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .setup-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .setup-screen h2 { color: #667eea; margin-bottom: 25px; }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: left;
+        }
+        .info-box strong { color: #667eea; display: block; margin-bottom: 8px; }
+        .code-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+        .code-display h3 { color: #667eea; margin-bottom: 10px; }
+        .code-display .code {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 5px;
+            font-family: monospace;
+        }
+        .name-inputs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .name-input-group { flex: 1; min-width: 200px; }
+        .name-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        .name-input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        .name-input-group input:focus { outline: none; border-color: #667eea; }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background: #6c757d; }
+        .main-screen { display: none; }
+        .sync-status {
+            background: rgba(212, 237, 218, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .sync-status strong { color: #667eea; }
+        .sync-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .scoreboard {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .scoreboard h2 { text-align: center; color: #667eea; margin-bottom: 20px; }
+        .scores { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .score-card {
+            flex: 1;
+            min-width: 150px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .score-card.winner {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            transform: scale(1.05);
+        }
+        .score-card h3 { font-size: 1.3em; margin-bottom: 10px; }
+        .score-card .score { font-size: 2.5em; font-weight: bold; }
+        .score-card .total { font-size: 0.9em; opacity: 0.9; }
+        .challenges-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .challenge-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .challenge-section h2 { color: #667eea; margin-bottom: 20px; text-align: center; }
+        .challenge-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .challenge-item.completed { background: #d4edda; opacity: 0.7; }
+        .challenge-checkbox {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .challenge-text {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+            word-wrap: break-word;
+        }
+        .challenge-item.completed .challenge-text {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .challenge-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .challenge-input:focus { outline: none; border-color: #667eea; }
+        .btn-small {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .add-challenge { display: flex; gap: 8px; margin-top: 15px; }
+        .prize-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        .prize-section h3 { color: #667eea; margin-bottom: 10px; text-align: center; }
+        .prize-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .prize-input:focus { outline: none; border-color: #667eea; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .modal-content h2 { color: #667eea; margin-bottom: 15px; font-size: 1.8em; }
+        .modal-content p { color: #333; font-size: 1.1em; margin-bottom: 20px; }
+        .prize-display {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti-fall 3s linear forwards;
+        }
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+        }
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            color: #666;
+            position: relative;
+        }
+        .divider:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ddd;
+        }
+        .divider span { background: white; padding: 0 15px; position: relative; }
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5em; }
+            .challenges-container { grid-template-columns: 1fr; }
+            .challenge-item { flex-wrap: wrap; }
+            .btn-small, .btn-delete { font-size: 12px; padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪐 Hasta Saturno y más allá 🪐</h1>
+
+        <div class="setup-screen" id="setupScreen">
+            <h2>Configuración</h2>
+            
+            <div class="info-box">
+                <strong>☁️ App Sincronizada</strong>
+                Esta app usa una base de datos gratuita para sincronizar automáticamente entre vuestros móviles.
+            </div>
+
+            <div id="createSection">
+                <h3 style="color: #667eea; margin-bottom: 20px;">Crear Nueva Pareja</h3>
+                <div class="name-inputs">
+                    <div class="name-input-group">
+                        <label for="person1Name">Tu nombre</label>
+                        <input type="text" id="person1Name" placeholder="Tu nombre">
+                    </div>
+                    <div class="name-input-group">
+                        <label for="person2Name">Nombre de tu pareja</label>
+                        <input type="text" id="person2Name" placeholder="Nombre de tu pareja">
+                    </div>
+                </div>
+                <button class="btn" onclick="createCouple()">Crear Pareja</button>
+            </div>
+
+            <div class="divider"><span>O</span></div>
+
+            <div id="joinSection">
+                <h3 style="color: #667eea; margin-bottom: 20px;">Unirse con Código</h3>
+                <div class="name-input-group" style="max-width: 400px; margin: 0 auto 20px;">
+                    <label for="coupleCode">Código de Pareja</label>
+                    <input type="text" id="coupleCode" placeholder="ABC123" style="text-align: center; font-size: 20px; letter-spacing: 3px; text-transform: uppercase;">
+                </div>
+                <button class="btn btn-secondary" onclick="joinCouple()">Unirse</button>
+            </div>
+        </div>
+
+        <div class="setup-screen" id="codeScreen" style="display: none;">
+            <h2>✅ ¡Pareja Creada!</h2>
+            
+            <div class="code-display">
+                <h3>Código de Pareja:</h3>
+                <div class="code" id="displayCode"></div>
+                <p style="margin-top: 15px; color: #666;">Compártelo con tu pareja</p>
+            </div>
+
+            <div class="info-box">
+                <strong>📱 Siguiente:</strong>
+                Tu pareja debe abrir esta app e introducir este código. Los cambios se sincronizarán automáticamente.
+            </div>
+
+            <button class="btn" onclick="continueToApp()">Continuar</button>
+        </div>
+
+        <div class="main-screen" id="mainScreen">
+            <div class="sync-status">
+                <span class="sync-indicator"></span>
+                <strong>Sincronizado</strong> - Código: <span id="currentCode"></span>
+            </div>
+
+            <div class="scoreboard">
+                <h2>🏆 Ranking 🏆</h2>
+                <div class="scores" id="scores"></div>
+            </div>
+
+            <div class="challenges-container">
+                <div class="challenge-section">
+                    <h2>Retos para <span id="person1NameDisplay"></span></h2>
+                    <div id="person1Challenges"></div>
+                    <div class="add-challenge">
+                        <input type="text" class="challenge-input" id="newChallengePerson1" placeholder="Nuevo reto...">
+                        <button class="btn-small" onclick="addChallenge('person1')">Añadir</button>
+                    </div>
+                    <div class="prize-section">
+                        <h3>🎁 Premio Final</h3>
+                        <input type="text" class="prize-input" id="prizePerson1" placeholder="¿Qué premio quieres?" onblur="savePrize('person1')">
+                    </div>
+                </div>
+
+                <div class="challenge-section">
+                    <h2>Retos para <span id="person2NameDisplay"></span></h2>
+                    <div id="person2Challenges"></div>
+                    <div class="add-challenge">
+                        <input type="text" class="challenge-input" id="newChallengePerson2" placeholder="Nuevo reto...">
+                        <button class="btn-small" onclick="addChallenge('person2')">Añadir</button>
+                    </div>
+                    <div class="prize-section">
+                        <h3>🎁 Premio Final</h3>
+                        <input type="text" class="prize-input" id="prizePerson2" placeholder="¿Qué premio quieres?" onblur="savePrize('person2')">
+                    </div>
+                </div>
+            </div>
+
+            <button class="reset-btn" onclick="resetApp()">Reiniciar App</button>
+        </div>
+
+        <div class="modal" id="prizeModal">
+            <div class="modal-content">
+                <h2>🎉 ¡Felicidades! 🎉</h2>
+                <p id="winnerMessage"></p>
+                <div class="prize-section">
+                    <h3>🎁 Tu Premio Final 🎁</h3>
+                    <div id="prizeContent"></div>
+                </div>
+                <button class="btn" onclick="closePrizeModal()">¡Genial!</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://gxkfqwuzhqwxbjxmqyrf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4a2Zxd3V6aHF3eGJqeG1xeXJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDkwNTg5NzQsImV4cCI6MjAyNDYzNDk3NH0.dB7uJZkP_Xu3fYvNqDFRZvQxLzJ6X8yPZqYJ9M4KN5s';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let coupleCode = '';
+        let subscription = null;
+
+        function generateCode() {
+            return 'HS' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+
+        window.onload = async function() {
+            const savedCode = localStorage.getItem('coupleCode');
+            if (savedCode) {
+                coupleCode = savedCode;
+                await initializeApp();
+            }
+        };
+
+        async function createCouple() {
+            const name1 = document.getElementById('person1Name').value.trim();
+            const name2 = document.getElementById('person2Name').value.trim();
+
+            if (!name1 || !name2) {
+                alert('Por favor, introduce ambos nombres');
+                return;
+            }
+
+            coupleCode = generateCode();
+            
+            const data = {
+                code: coupleCode,
+                person1_name: name1,
+                person2_name: name2,
+                person1_challenges: [],
+                person2_challenges: [],
+                person1_prize: '',
+                person2_prize: '',
+                person1_won: false,
+                person2_won: false
+            };
+
+            const { error } = await supabase.from('couples').insert([data]);
+
+            if (error) {
+                alert('Error: ' + error.message);
+                return;
+            }
+
+            localStorage.setItem('coupleCode', coupleCode);
+            document.getElementById('displayCode').textContent = coupleCode;
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('codeScreen').style.display = 'block';
+        }
+
+        async function joinCouple() {
+            const code = document.getElementById('coupleCode').value.trim().toUpperCase();
+            if (!code) {
+                alert('Introduce el código');
+                return;
+            }
+
+            const { data, error } = await supabase
+                .from('couples')
+                .select('*')
+                .eq('code', code)
+                .single();
+
+            if (error || !data) {
+                alert('Código no encontrado');
+                return;
+            }
+
+            coupleCode = code;
+            localStorage.setItem('coupleCode', coupleCode);
+            await initializeApp();
+        }
+
+        function continueToApp() {
+            initializeApp();
+        }
+
+        async function initializeApp() {
+            document.getElementById('setupScreen').style.display = 'none';
+            document.getElementById('codeScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'block';
+            document.getElementById('currentCode').textContent = coupleCode;
+
+            await loadData();
+
+            subscription = supabase
+                .channel('couples_channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'couples', filter: `code=eq.${coupleCode}` },
+                    () => loadData()
+                )
+                .subscribe();
+        }
+
+        async function loadData() {
+            const { data } = await supabase
+                .from('couples')
+                .select('*')
+                .eq('code', coupleCode)
+                .single();
+
+            if (data) renderApp(data);
+        }
+
+        function renderApp(data) {
+            const p1Challenges = data.person1_challenges || [];
+            const p2Challenges = data.person2_challenges || [];
+            const score1 = p1Challenges.filter(c => c.completed).length;
+            const score2 = p2Challenges.filter(c => c.completed).length;
+
+            document.getElementById('scores').innerHTML = `
+                <div class="score-card ${score1 > score2 ? 'winner' : ''}">
+                    <h3>${data.person1_name}</h3>
+                    <div class="score">${score1}</div>
+                    <div class="total">de ${p1Challenges.length}</div>
+                </div>
+                <div class="score-card ${score2 > score1 ? 'winner' : ''}">
+                    <h3>${data.person2_name}</h3>
+                    <div class="score">${score2}</div>
+                    <div class="total">de ${p2Challenges.length}</div>
+                </div>
+            `;
+
+            renderChallenges('person1', data.person1_name, p1Challenges);
+            renderChallenges('person2', data.person2_name, p2Challenges);
+
+            document.getElementById('prizePerson1').value = data.person1_prize || '';
+            document.getElementById('prizePerson2').value = data.person2_prize || '';
+        }
+
+        function renderChallenges(person, name, challenges) {
+            document.getElementById(`${person}NameDisplay`).textContent = name;
+            document.getElementById(`${person}Challenges`).innerHTML = challenges.map((c, i) => `
+                <div class="challenge-item ${c.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="challenge-checkbox" ${c.completed ? 'checked' : ''} 
+                           onchange="toggleChallenge('${person}', ${i})">
+                    <span class="challenge-text">${c.text}</span>
+                    <button class="btn-delete" onclick="deleteChallenge('${person}', ${i})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        async function addChallenge(person) {
+            const input = document.getElementById(`newChallenge${person.charAt(0).toUpperCase() + person.slice(1)}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const { data } = await supabase.from('couples').select('*').eq('code', coupleCode).single();
+            const field = `${person}_challenges`;
+            const challenges = data[field] || [];
+            challenges.push({ text, completed: false });
+
+            await supabase.from('couples').update({ [field]: challenges }).eq('code', coupleCode);
+            input.value = '';
+        }
+
+        async function toggleChallenge(person, index) {
+            const { data } = await supabase.from('couples').select('*').eq('code', coupleCode).single();
+            const field = `${person}_challenges`;
+            const challenges = data[field];
+            challenges[index].completed = !challenges[index].completed;
+            await supabase.from('couples').update({ [field]: challenges }).eq('code', coupleCode);
+
+            const allComplete = challenges.every(c => c.completed) && challenges.length > 0;
+            const prizeField = `${person}_prize`;
+            const wonField = `${person}_won`;
+            if (allComplete && data[prizeField] && !data[wonField]) {
+                await supabase.from('couples').update({ [wonField]: true }).eq('code', coupleCode);
+                showPrizeModal(data[person === 'person1' ? 'person1_name' : 'person2_name'], data[prizeField]);
+            }
+        }
+
+        async function deleteChallenge(person, index) {
+            if (!confirm('¿Eliminar?')) return;
+            const { data } = await supabase.from('couples').select('*').eq('code', coupleCode).single();
+            const field = `${person}_challenges`;
+            const challenges = data[field];
+            challenges.splice(index, 1);
+            await supabase.from('couples').update({ [field]: challenges }).eq('code', coupleCode);
+        }
+
+        async function savePrize(person) {
+            const input = document.getElementById(`prize${person.charAt(0).toUpperCase() + person.slice(1)}`);
+            await supabase.from('couples').update({ [`${person}_prize`]: input.value }).eq('code', coupleCode);
+        }
+
+        function showPrizeModal(name, prize) {
+            document.getElementById('winnerMessage').textContent = `¡${name} completó todos los retos!`;
+            document.getElementById('prizeContent').innerHTML = `<div class="prize-display">${prize}</div>`;
+            document.getElementById('prizeModal').classList.add('show');
+            createConfetti();
+        }
+
+        function closePrizeModal() {
+            document.getElementById('prizeModal').classList.remove('show');
+        }
+
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#ffd89b', '#19547b'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + '%';
+                    c.style.top = '-10px';
+                    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        async function resetApp() {
+            if (!confirm('¿Seguro?')) return;
+            await supabase.from('couples').delete().eq('code', coupleCode);
+            localStorage.removeItem('coupleCode');
+            location.reload();
+        }
+    </script>
+</body>
+</html>
